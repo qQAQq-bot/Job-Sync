@@ -4,6 +4,7 @@ defineProps<{
   ready: boolean;
   assembling: boolean;
   exporting: boolean;
+  needsRegenerate: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -28,6 +29,10 @@ const emit = defineEmits<{
             {{ exporting ? '导出中…' : '导出 PDF' }}
           </button>
         </div>
+      </div>
+
+      <div v-if="finalText && needsRegenerate" class="ui-status-warning mt-4 p-4 text-sm">
+        检测到模块内容已更新，请先点击“生成最终稿”同步最终简历。
       </div>
 
       <div v-if="finalText" class="mt-4 whitespace-pre-wrap rounded-xl bg-base/25 p-4 text-sm leading-relaxed text-content-secondary ring-1 ring-border/10">

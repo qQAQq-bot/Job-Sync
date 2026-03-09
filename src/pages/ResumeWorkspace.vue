@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { open } from "@tauri-apps/plugin-dialog";
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 import ResumeBasicProfileForm from "../components/resume-workspace/ResumeBasicProfileForm.vue";
 import ResumeCandidatePreview from "../components/resume-workspace/ResumeCandidatePreview.vue";
@@ -26,6 +26,15 @@ import {
 } from "../lib/resumeWorkspace";
 import { isTauri } from "../lib/tauri";
 
+const ACCEPT_TOAST_FADE_DELAY_MS = 2600;
+const ACCEPT_TOAST_HIDE_DELAY_MS = 3000;
+const FINAL_RESUME_SECTIONS: Array<{ key: ResumeModuleKey; title: string }> = [
+  { key: "summary", title: "个人简介" },
+  { key: "projects", title: "项目经历" },
+  { key: "experience", title: "工作经历" },
+  { key: "skills", title: "技能清单" },
+];
+
 const tauri = isTauri();
 const draft = ref<ResumeWorkspaceDraft>(createDefaultResumeWorkspaceDraft());
 const currentStep = ref<ResumeWorkspaceStepKey>("original");
@@ -36,10 +45,27 @@ const assembling = ref(false);
 const exporting = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
+const acceptToastMessage = ref<string | null>(null);
+const acceptToastVisible = ref(false);
+const acceptToastFading = ref(false);
+
+let acceptToastFadeTimer: ReturnType<typeof setTimeout> | null = null;
+let acceptToastHideTimer: ReturnType<typeof setTimeout> | null = null;
 
 const currentModule = computed(() => RESUME_MODULES.find((item) => item.key === currentStep.value) ?? null);
 const readyForFinal = computed(() => RESUME_MODULES.every((item) => !!draft.value[item.key].confirmed?.trim()));
 const showCandidateAside = computed(() => !!currentModule.value);
+const assembledConfirmedResumeText = computed(() => {
+  const sections = FINAL_RESUME_SECTIONS.flatMap(({ key, title }) => {
+    const content = draft.value[key].confirmed?.trim();
+    return content ? [`## ${title}\n${content}`] : [];
+  });
+  return sections.join("\n\n");
+});
+const needsRegenerateFinal = computed(() => {
+  if (!draft.value.final_resume_text?.trim()) return false;
+  return normalizeResumeText(assembledConfirmedResumeText.value) !== normalizeResumeText(draft.value.final_resume_text);
+});
 
 function buildModuleInput(module: ResumeModuleKey): string {
   const parts = [draft.value[module].input.trim(), draft.value[module].followup_input.trim()].filter(Boolean);
@@ -66,6 +92,39 @@ const navItems = computed<ResumeWorkspaceNavItem[]>(() => {
 function activeDiagnosisSection(): ResumeDiagnosisSection | null {
   if (!currentModule.value || !draft.value.diagnosis) return null;
   return draft.value.diagnosis[currentModule.value.key] ?? null;
+}
+
+function normalizeResumeText(value?: string | null): string {
+  return (value ?? "").replace(/\r\n/g, "\n").trim();
+}
+
+function clearAcceptToastTimers(): void {
+  if (acceptToastFadeTimer) {
+    clearTimeout(acceptToastFadeTimer);
+    acceptToastFadeTimer = null;
+  }
+  if (acceptToastHideTimer) {
+    clearTimeout(acceptToastHideTimer);
+    acceptToastHideTimer = null;
+  }
+}
+
+function showAcceptToast(message: string): void {
+  clearAcceptToastTimers();
+  acceptToastMessage.value = message;
+  acceptToastVisible.value = true;
+  acceptToastFading.value = false;
+
+  acceptToastFadeTimer = setTimeout(() => {
+    acceptToastFading.value = true;
+  }, ACCEPT_TOAST_FADE_DELAY_MS);
+
+  acceptToastHideTimer = setTimeout(() => {
+    acceptToastVisible.value = false;
+    acceptToastFading.value = false;
+    acceptToastMessage.value = null;
+    clearAcceptToastTimers();
+  }, ACCEPT_TOAST_HIDE_DELAY_MS);
 }
 
 async function persistDraft(): Promise<void> {
@@ -145,9 +204,19 @@ async function generateCandidate(module: ResumeModuleKey): Promise<void> {
 async function acceptCandidate(module: ResumeModuleKey): Promise<void> {
   const candidate = draft.value[module].candidate?.trim();
   if (!candidate) return;
+
+  error.value = null;
+  success.value = null;
+  const previousConfirmed = draft.value[module].confirmed ?? null;
   draft.value[module].confirmed = candidate;
-  await persistDraft();
-  success.value = `${getModuleLabel(module)}已确认。`;
+
+  try {
+    await persistDraft();
+    showAcceptToast(`${getModuleLabel(module)}已确认。`);
+  } catch (e) {
+    draft.value[module].confirmed = previousConfirmed;
+    error.value = e instanceof Error ? e.message : String(e);
+  }
 }
 
 async function assembleFinalResume(): Promise<void> {
@@ -183,9 +252,36 @@ async function exportPdf(): Promise<void> {
 onMounted(() => {
   void loadDraft();
 });
+
+onBeforeUnmount(() => {
+  clearAcceptToastTimers();
+});
 </script>
 
 <template>
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="-translate-y-2 opacity-0"
+      enter-to-class="translate-y-0 opacity-100"
+      leave-active-class="transition-all duration-300 ease-in"
+      leave-from-class="translate-y-0 opacity-100"
+      leave-to-class="-translate-y-2 opacity-0"
+    >
+      <div
+        v-if="acceptToastVisible && acceptToastMessage"
+        class="pointer-events-none fixed inset-x-0 top-4 z-[999] flex justify-center px-4"
+      >
+        <div
+          class="ui-status-success w-full max-w-xl px-4 py-3 text-sm shadow-lg backdrop-blur-md transition-opacity duration-300"
+          :class="acceptToastFading ? 'opacity-0' : 'opacity-100'"
+        >
+          {{ acceptToastMessage }}
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   <section class="space-y-5">
     <header class="space-y-1">
       <h1 class="text-xl font-semibold text-content-primary">简历工作区</h1>
@@ -251,6 +347,7 @@ onMounted(() => {
           :ready="readyForFinal"
           :assembling="assembling"
           :exporting="exporting"
+          :needs-regenerate="needsRegenerateFinal"
           @assemble="assembleFinalResume"
           @export="exportPdf"
         />
