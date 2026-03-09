@@ -28,20 +28,15 @@ set "PUPPETEER_SKIP_DOWNLOAD=1" && npm install
 setx PUPPETEER_SKIP_DOWNLOAD 1
 ```
 
-如果你跳过了下载，需要指定本机 Chrome / Edge 路径（示例二选一）：
+如果你跳过了 Chromium 下载，需要在软件启动后进入“设置”页，手动指定本机 Chrome / Edge 可执行文件路径，例如：
 
-```bat
-set "PUPPETEER_EXECUTABLE_PATH=C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-```
-
-```bat
-set "PUPPETEER_EXECUTABLE_PATH=C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
-```
+- `C:\Program Files\Google\Chrome\Application\chrome.exe`
+- `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`
 
 ## 启动（开发）
 
 ```bat
-npm run tauri:dev
+npm run tauri dev
 ```
 
 - 说明：`src-tauri/tauri.conf.json` 的 `beforeDevCommand` 会先构建 `packages/boss-crawler-worker/dist/`，避免找不到 worker 入口。
@@ -50,19 +45,22 @@ npm run tauri:dev
 ## 打包（Windows）
 
 ```bat
-npm run tauri:build
+npm run tauri build
 ```
 
-- 说明：`scripts/tauri-build.mjs` 会使用 `src-tauri/tauri.conf.release.json`（包含 `bundle.externalBin`），并在 `beforeBuildCommand` 里生成 sidecar 可执行体到 `src-tauri/bin/`，再打进安装包。
+- 说明：发布打包会先构建前端，再由 Tauri 生成 Windows 安装包；sidecar 构建流程由项目脚本处理。
 
 ## 功能特性
 
-- **采集**：手动 / 自动两种模式，自动模式支持关键词、城市、薪资、经验等多维筛选，带限流参数（maxPages / maxJobs / delayMs）
-- **AI 分析**：简历导入支持粘贴文本或选择 PDF 文件（互斥模式切换），通过职位库搜索选择目标职位，模型列表从 API 动态加载（下拉选择），调用 OpenAI 兼容 API 生成结构化匹配报告
-- **职位库**：SQLite 落库，支持搜索、详情查看、CSV / JSON 导出
-- **原生对话框**：通过 `@tauri-apps/plugin-dialog` 实现 PDF 文件选择
-- **窗口尺寸**：默认 1200x800，适配侧边栏布局
+- **采集工作台**：支持登录态检测与浏览器登录，提供手动采集和自动采集两种模式；自动采集支持关键词、城市、薪资、经验、学历、行业、公司规模等筛选，以及 `maxPages`、`maxJobs`、`delayMs` 等运行参数。
+- **筛选字典同步**：可读取本地缓存或同步 Boss 站点筛选元数据，减少手填枚举值，便于自动采集直接选项化配置。
+- **运行日志与进度**：采集页实时展示 sidecar 运行状态、当前关键词、分页进度、职位列表/详情采集数量与运行日志。
+- **职位库管理**：采集结果写入本地 SQLite，支持按关键词分组浏览、搜索职位/公司、展开职位详情、复制职位链接、删除单条职位或清空全部数据。
+- **数据导出**：支持从职位库导出 CSV / JSON，便于后续分析、归档或二次处理。
+- **AI 职位匹配分析**：支持从职位库选择一个或多个职位，导入简历文本或 PDF，结合补充背景说明生成结构化匹配报告，并支持强制忽略缓存重新生成。
+- **AI 综合报告**：支持基于多个职位生成综合分析报告，用于归纳岗位共性要求、风险点、建议方向和优先级判断。
+- **AI 报告查看器**：提供本地缓存报告列表、搜索筛选、分页切换、综合报告与单职位报告切换，以及原始 JSON 兜底查看能力。
+- **简历工作区**：支持导入原始简历文本或 PDF，先做 AI 诊断，再按摘要、项目、经历、技能等模块逐步改写、确认候选稿并组装最终简历。
+- **PDF 导出**：最终简历支持导出 PDF，便于直接投递或继续人工润色。
+- **设置中心**：支持配置浏览器可执行文件路径以及 OpenAI 兼容 API 的 Key、Base URL、模型和模式等参数。
 
-## 推荐 IDE
-
-- VS Code + Vue - Official + Tauri + rust-analyzer
