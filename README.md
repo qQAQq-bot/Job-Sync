@@ -64,3 +64,7 @@ npm run tauri build
 - **PDF 导出**：最终简历支持导出 PDF，便于直接投递或继续人工润色。
 - **设置中心**：支持配置浏览器可执行文件路径以及 OpenAI 兼容 API 的 Key、Base URL、模型和模式等参数。
 
+
+## License
+
+本项目采用 [MIT License](./LICENSE)。
