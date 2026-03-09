@@ -1,14 +1,9 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
 
-const env = {
-  ...process.env,
-  TAURI_CONFIG: "src-tauri/tauri.conf.release.json",
-};
-
-const child = spawn("tauri", ["build"], {
+const child = spawn("tauri", ["build", "--config", "src-tauri/tauri.conf.release.json"], {
   stdio: "inherit",
-  env,
+  env: process.env,
   shell: process.platform === "win32",
 });
 

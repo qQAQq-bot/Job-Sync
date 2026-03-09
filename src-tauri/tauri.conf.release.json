@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "npm run build:worker && npm run dev",
     "devUrl": "http://localhost:1430",
-    "beforeBuildCommand": "npm run build:worker:exe:win && npm run build",
+    "beforeBuildCommand": "npm run stage:worker:runtime:win && npm run build",
     "frontendDist": "../dist"
   },
   "app": {
@@ -25,8 +25,8 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
-    "externalBin": ["bin/boss-crawler-worker"],
+    "targets": ["msi"],
+    "resources": ["bin/node.exe", "bin/boss-crawler-worker/"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

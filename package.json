@@ -13,9 +13,12 @@
     "tauri": "tauri",
     "tauri:dev": "npm run tauri dev",
     "tauri:build": "node scripts/tauri-build.mjs",
+    "tauri:build:portable": "node scripts/build-portable.mjs",
+    "tauri:build:portable:only": "node scripts/build-portable.mjs --skip-build",
+    "tauri:build:release": "npm run tauri:build && npm run tauri:build:portable:only",
     "build:worker": "npm -w @job-sync/boss-crawler-worker run build",
     "start:worker": "npm -w @job-sync/boss-crawler-worker run start",
-    "build:worker:exe:win": "npm -w @job-sync/boss-crawler-worker run build:exe:win"
+    "stage:worker:runtime:win": "node scripts/stage-worker-runtime.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

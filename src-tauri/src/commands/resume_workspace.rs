@@ -15,15 +15,7 @@ use crate::{
 };
 
 fn spawn_worker_event(app: &tauri::AppHandle, app_data_dir: &Path, command: &CommandIn) -> Result<Value, String> {
-  let program = worker::resolve_worker_program(app);
-  let mut cmd = match program {
-    worker::WorkerProgram::Sidecar(bin) => Command::new(bin),
-    worker::WorkerProgram::NodeScript(entry) => {
-      let mut c = Command::new("node");
-      c.arg(entry);
-      c
-    }
-  };
+  let mut cmd = worker::build_worker_command(app)?;
 
   cmd.stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::inherit());
   settings::apply_worker_env(&mut cmd, app_data_dir);

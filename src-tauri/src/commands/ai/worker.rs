@@ -40,17 +40,7 @@ fn build_worker_process(
 }
 
 fn resolve_worker_base_command(app: &AppHandle) -> Result<Command, String> {
-  match crate::worker::resolve_worker_program(app) {
-    crate::worker::WorkerProgram::Sidecar(bin) => Ok(Command::new(bin)),
-    crate::worker::WorkerProgram::NodeScript(entry) => {
-      if !entry.exists() {
-        return Err(format!("worker entry not found: {}", entry.display()));
-      }
-      let mut cmd = Command::new("node");
-      cmd.arg(entry);
-      Ok(cmd)
-    }
-  }
+  crate::worker::build_worker_command(app)
 }
 
 fn configure_worker_process(

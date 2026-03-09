@@ -53,4 +53,15 @@ Communicates with the Tauri (Rust) host process over **stdin/stdout NDJSON**:
 npm run build:worker
 ```
 
-Output goes to `dist/main.cjs` (CommonJS bundle for pkg/sidecar packaging).
+The TypeScript build emits ESM output to `dist/main.js` using the package's `type: module` plus `NodeNext` compiler settings.
+
+## Windows release packaging
+
+Windows release builds do not use `pkg`. Instead, the root `stage:worker:runtime:win` workflow stages these files into `src-tauri/bin/`:
+
+- `node.exe`
+- `boss-crawler-worker/dist/**`
+- `boss-crawler-worker/package.json`
+- production `boss-crawler-worker/node_modules`
+
+The staged `package.json` must be kept next to `dist/main.js` so Node preserves ESM resolution during MSI and portable launches.

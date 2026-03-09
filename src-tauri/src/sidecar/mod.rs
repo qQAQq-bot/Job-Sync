@@ -2,7 +2,7 @@ use std::{
   collections::HashSet,
   io::{BufRead, BufReader, Write},
   path::{Path, PathBuf},
-  process::{Child, ChildStdin, Command, Stdio},
+  process::{Child, ChildStdin, Stdio},
   sync::{Arc, Mutex},
   thread,
 };
@@ -103,19 +103,7 @@ impl SidecarManager {
       return Ok(());
     }
 
-    let program = crate::worker::resolve_worker_program(&self.app_handle);
-
-    let mut cmd = match program {
-      crate::worker::WorkerProgram::Sidecar(bin) => Command::new(bin),
-      crate::worker::WorkerProgram::NodeScript(entry) => {
-        if !entry.exists() {
-          return Err(SidecarError::Message(format!("worker entry not found: {}", entry.display())));
-        }
-        let mut c = Command::new("node");
-        c.arg(entry);
-        c
-      }
-    };
+    let mut cmd = crate::worker::build_worker_command(&self.app_handle).map_err(SidecarError::Message)?;
 
     settings::apply_worker_env(&mut cmd, &self.app_data_dir);
 
