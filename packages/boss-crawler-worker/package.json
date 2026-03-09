@@ -1,0 +1,28 @@
+{
+  "name": "@job-sync/boss-crawler-worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "bin": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "build:exe:win": "npm run build && pkg . --targets node20-win-x64 --output ../../src-tauri/bin/boss-crawler-worker-x86_64-pc-windows-msvc.exe"
+  },
+  "pkg": {
+    "assets": ["dist/**/*"]
+  },
+  "dependencies": {
+    "puppeteer": "^24.15.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "pkg": "^5.8.1",
+    "typescript": "^5.6.0"
+  }
+}
+
