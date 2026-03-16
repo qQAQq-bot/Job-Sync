@@ -8,12 +8,16 @@ mod ipc;
 mod paths;
 mod resume_text;
 mod resume_workspace;
+mod resume_workspaces;
 mod resume_pdf_template;
 mod resume_pdf_support;
 mod sidecar;
 mod settings;
 mod storage;
 mod worker;
+
+#[cfg(test)]
+mod resume_workspace_tests;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -57,7 +61,11 @@ pub fn run() {
       commands::settings::set_browser_executable_path,
       commands::settings::set_ai_settings,
       commands::settings::save_settings,
-      commands::resume_workspace::get_resume_workspace_draft,
+      commands::resume_workspace::get_resume_workspace_state,
+      commands::resume_workspace::create_resume_workspace,
+      commands::resume_workspace::switch_resume_workspace,
+      commands::resume_workspace::rename_resume_workspace,
+      commands::resume_workspace::delete_resume_workspace,
       commands::resume_workspace::save_resume_workspace_draft,
       commands::resume_workspace::diagnose_resume_workspace,
       commands::resume_workspace::rewrite_resume_workspace_module,

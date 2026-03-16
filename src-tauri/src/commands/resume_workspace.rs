@@ -11,6 +11,7 @@ use crate::{
   ipc::protocol::{CommandIn, EventOut, ResumeDiagnosePayload, ResumeRewriteModulePayload},
   paths, resume_pdf_template, resume_text,
   resume_workspace::{self, DiagnoseResumeRequest, ResumeModuleCandidate, ResumeWorkspaceDraft, RewriteResumeModuleRequest},
+  resume_workspaces::{self, CreateResumeWorkspaceRequest, ResumeWorkspaceState},
   settings, worker,
 };
 
@@ -150,15 +151,50 @@ fn export_resume_workspace_pdf_blocking(
 }
 
 #[tauri::command]
-pub fn get_resume_workspace_draft(app: tauri::AppHandle) -> Result<ResumeWorkspaceDraft, String> {
+pub fn get_resume_workspace_state(app: tauri::AppHandle) -> Result<ResumeWorkspaceState, String> {
   let app_data_dir = paths::resolve_data_dir(&app)?;
-  resume_workspace::load_draft(&app_data_dir)
+  resume_workspaces::get_state(&app_data_dir)
 }
 
 #[tauri::command]
-pub fn save_resume_workspace_draft(app: tauri::AppHandle, draft: ResumeWorkspaceDraft) -> Result<ResumeWorkspaceDraft, String> {
+pub fn create_resume_workspace(
+  app: tauri::AppHandle,
+  request: CreateResumeWorkspaceRequest,
+) -> Result<ResumeWorkspaceState, String> {
   let app_data_dir = paths::resolve_data_dir(&app)?;
-  resume_workspace::save_draft(&app_data_dir, draft)
+  resume_workspaces::create_workspace(&app_data_dir, request)
+}
+
+#[tauri::command]
+pub fn switch_resume_workspace(app: tauri::AppHandle, workspace_id: String) -> Result<ResumeWorkspaceState, String> {
+  let app_data_dir = paths::resolve_data_dir(&app)?;
+  resume_workspaces::switch_workspace(&app_data_dir, &workspace_id)
+}
+
+#[tauri::command]
+pub fn rename_resume_workspace(
+  app: tauri::AppHandle,
+  workspace_id: String,
+  title: String,
+) -> Result<ResumeWorkspaceState, String> {
+  let app_data_dir = paths::resolve_data_dir(&app)?;
+  resume_workspaces::rename_workspace(&app_data_dir, &workspace_id, &title)
+}
+
+#[tauri::command]
+pub fn delete_resume_workspace(app: tauri::AppHandle, workspace_id: String) -> Result<ResumeWorkspaceState, String> {
+  let app_data_dir = paths::resolve_data_dir(&app)?;
+  resume_workspaces::delete_workspace(&app_data_dir, &workspace_id)
+}
+
+#[tauri::command]
+pub fn save_resume_workspace_draft(
+  app: tauri::AppHandle,
+  workspace_id: String,
+  draft: ResumeWorkspaceDraft,
+) -> Result<ResumeWorkspaceState, String> {
+  let app_data_dir = paths::resolve_data_dir(&app)?;
+  resume_workspaces::save_workspace_draft(&app_data_dir, &workspace_id, draft)
 }
 
 #[tauri::command]

@@ -12,25 +12,47 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <aside class="ui-panel-muted p-3">
-    <div class="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-content-muted">工作流</div>
+  <aside class="resume-workflow-rail">
+    <div class="px-1 pb-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">审阅流程</div>
     <div class="space-y-1">
-      <button
-        v-for="item in items"
-        :key="item.key"
-        type="button"
-        class="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors duration-150"
-        :class="item.key === currentStep ? 'bg-card-hover/80 text-content-primary ring-1 ring-border-glow/20' : 'text-content-secondary hover:bg-card-hover/60 hover:text-content-primary'"
-        @click="emit('select', item.key)"
-      >
-        <span class="truncate">{{ item.label }}</span>
-        <span
-          class="ui-badge px-2 py-0.5"
-          :class="item.status === 'done' ? 'bg-emerald-400/10 text-emerald-300 ring-emerald-400/20' : item.status === 'active' ? 'bg-border-glow/10 text-cyan-300 ring-border-glow/20' : ''"
+      <div v-for="(item, index) in items" :key="item.key" class="relative">
+        <div v-if="index < items.length - 1" class="absolute left-[1.35rem] top-12 h-[calc(100%-2rem)] w-px bg-white/10" />
+        <button
+          type="button"
+          class="resume-workflow-item"
+          :class="item.key === currentStep ? 'border border-cyan-300/10 bg-slate-900/60 shadow-[0_18px_44px_-34px_rgba(15,23,42,0.9)]' : 'hover:bg-slate-900/38'"
+          @click="emit('select', item.key)"
         >
-          {{ item.status === "done" ? "已完成" : item.status === "active" ? "当前" : "待处理" }}
-        </span>
-      </button>
+          <span
+            class="resume-workflow-index"
+            :class="item.status === 'done'
+              ? 'border-emerald-300/25 bg-emerald-400/10 text-emerald-100'
+              : item.status === 'active'
+                ? 'border-cyan-300/32 bg-cyan-300/10 text-cyan-100'
+                : 'border-white/8 bg-slate-900/45 text-slate-300'"
+          >
+            {{ String(index + 1).padStart(2, "0") }}
+          </span>
+
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm font-medium" :class="item.key === currentStep ? 'text-slate-50' : 'text-slate-200'">{{ item.label }}</span>
+            <span class="mt-1 block text-xs text-slate-400">
+              {{ item.status === "done" ? "已完成" : item.status === "active" ? "当前步骤" : "待处理" }}
+            </span>
+          </span>
+
+          <span
+            class="resume-workflow-tag"
+            :class="item.status === 'done'
+              ? 'bg-emerald-400/10 text-emerald-100'
+              : item.status === 'active'
+                ? 'bg-cyan-300/10 text-cyan-100'
+                : 'bg-slate-900/55 text-slate-400'"
+          >
+            {{ item.status === "done" ? "已完成" : item.status === "active" ? "进行中" : "待处理" }}
+          </span>
+        </button>
+      </div>
     </div>
   </aside>
 </template>

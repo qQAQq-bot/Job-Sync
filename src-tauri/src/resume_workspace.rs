@@ -1,7 +1,9 @@
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
+#[cfg(test)]
 use serde_json::Value;
+#[cfg(test)]
 use time::format_description::well_known::Rfc3339;
 
 use crate::storage;
@@ -157,6 +159,7 @@ fn default_source_mode() -> String {
   "text".to_string()
 }
 
+#[cfg(test)]
 fn now_rfc3339() -> String {
   time::OffsetDateTime::now_utc().format(&Rfc3339).unwrap()
 }
@@ -172,6 +175,7 @@ pub fn load_draft(app_data_dir: &Path) -> Result<ResumeWorkspaceDraft, String> {
   serde_json::from_value(raw).map_err(|e| format!("解析简历工作区草稿失败：{e}"))
 }
 
+#[cfg(test)]
 pub fn save_draft(app_data_dir: &Path, mut draft: ResumeWorkspaceDraft) -> Result<ResumeWorkspaceDraft, String> {
   draft.updated_at = Some(now_rfc3339());
   let value: Value = serde_json::to_value(&draft).map_err(|e| e.to_string())?;

@@ -15,6 +15,7 @@ const stagedWorkerDir = path.join(tauriBinDir, "boss-crawler-worker");
 const stagedWorkerDistDir = path.join(stagedWorkerDir, "dist");
 const stagedWorkerPackageJsonPath = path.join(stagedWorkerDir, "package.json");
 const stagedNodePath = path.join(tauriBinDir, "node.exe");
+const legacyWorkerExePath = path.join(tauriBinDir, "boss-crawler-worker.exe");
 
 function runCommand(command, args, options = {}) {
   const { cwd = projectRoot, env = process.env } = options;
@@ -133,6 +134,7 @@ async function main() {
 
   await fs.rm(stagedWorkerDir, { recursive: true, force: true });
   await fs.rm(stagedNodePath, { force: true });
+  await fs.rm(legacyWorkerExePath, { force: true });
   await fs.mkdir(tauriBinDir, { recursive: true });
 
   await copyDirectory(workerDistDir, stagedWorkerDistDir);

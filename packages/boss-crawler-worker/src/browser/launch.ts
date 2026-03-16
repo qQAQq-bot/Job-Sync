@@ -1,27 +1,17 @@
 import type { Browser, Page, Target } from "puppeteer";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import puppeteerExtra from "puppeteer-extra";
+import stealthPlugin from "puppeteer-extra-plugin-stealth";
 
 import { injectStealthScript, applyStealthToAllPages } from "./stealth.js";
 import { stripHeadlessUserAgent, stripUaForAllPages } from "./ua.js";
 
-let puppeteerExtraInstance: any | null = null;
 let pluginsInstalled = false;
-
-async function loadPuppeteerExtra(): Promise<any> {
-  if (puppeteerExtraInstance) return puppeteerExtraInstance;
-  const mod = await import("puppeteer-extra");
-  puppeteerExtraInstance = (mod as any).default ?? mod;
-  return puppeteerExtraInstance;
-}
 
 async function installPlugins(puppeteer: any): Promise<void> {
   if (pluginsInstalled) return;
-
-  const stealthMod = await import("puppeteer-extra-plugin-stealth");
-  const stealthFactory: any = (stealthMod as any).default ?? stealthMod;
-
-  puppeteer.use(stealthFactory());
+  puppeteer.use((stealthPlugin as any).default?.() ?? (stealthPlugin as any)());
   pluginsInstalled = true;
 }
 
@@ -70,7 +60,7 @@ export async function launchBrowser(options: LaunchBrowserOptions): Promise<{
   browser: Browser;
   page: Page;
 }> {
-  const puppeteer = await loadPuppeteerExtra();
+  const puppeteer = (puppeteerExtra as any).default ?? puppeteerExtra;
   await installPlugins(puppeteer);
 
   const executablePath =

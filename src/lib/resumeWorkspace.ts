@@ -52,6 +52,33 @@ export interface ResumeWorkspaceDraft {
   updated_at?: string | null;
 }
 
+export interface ResumeWorkspaceMeta {
+  id: string;
+  title: string;
+  source_mode: "text" | "file" | string;
+  source_name: string;
+  created_at: string;
+  updated_at: string;
+  has_diagnosis: boolean;
+  confirmed_modules: number;
+  has_final_resume: boolean;
+}
+
+export interface ResumeWorkspaceState {
+  active_workspace_id: string;
+  workspaces: ResumeWorkspaceMeta[];
+  draft: ResumeWorkspaceDraft;
+}
+
+export interface CreateResumeWorkspaceRequest {
+  title?: string | null;
+  source_mode?: "text" | "file" | null;
+  original_resume_text?: string | null;
+  original_resume_file?: string | null;
+  basic_profile?: ResumeBasicProfile | null;
+  context_text?: string | null;
+}
+
 export interface ResumeModuleCandidate {
   module: ResumeModuleKey;
   candidate: string;
@@ -112,12 +139,28 @@ export function getModuleLabel(module: ResumeModuleKey): string {
   return RESUME_MODULES.find((item) => item.key === module)?.label ?? module;
 }
 
-export async function getResumeWorkspaceDraft(): Promise<ResumeWorkspaceDraft> {
-  return invoke<ResumeWorkspaceDraft>("get_resume_workspace_draft");
+export async function getResumeWorkspaceState(): Promise<ResumeWorkspaceState> {
+  return invoke<ResumeWorkspaceState>("get_resume_workspace_state");
 }
 
-export async function saveResumeWorkspaceDraft(draft: ResumeWorkspaceDraft): Promise<ResumeWorkspaceDraft> {
-  return invoke<ResumeWorkspaceDraft>("save_resume_workspace_draft", { draft });
+export async function createResumeWorkspace(request: CreateResumeWorkspaceRequest = {}): Promise<ResumeWorkspaceState> {
+  return invoke<ResumeWorkspaceState>("create_resume_workspace", { request });
+}
+
+export async function switchResumeWorkspace(workspaceId: string): Promise<ResumeWorkspaceState> {
+  return invoke<ResumeWorkspaceState>("switch_resume_workspace", { workspaceId });
+}
+
+export async function renameResumeWorkspace(workspaceId: string, title: string): Promise<ResumeWorkspaceState> {
+  return invoke<ResumeWorkspaceState>("rename_resume_workspace", { workspaceId, title });
+}
+
+export async function deleteResumeWorkspace(workspaceId: string): Promise<ResumeWorkspaceState> {
+  return invoke<ResumeWorkspaceState>("delete_resume_workspace", { workspaceId });
+}
+
+export async function saveResumeWorkspaceDraft(workspaceId: string, draft: ResumeWorkspaceDraft): Promise<ResumeWorkspaceState> {
+  return invoke<ResumeWorkspaceState>("save_resume_workspace_draft", { workspaceId, draft });
 }
 
 export async function diagnoseResumeWorkspace(request: {

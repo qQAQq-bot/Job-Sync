@@ -7,6 +7,9 @@ use std::{
   thread,
 };
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
 use serde_json::Value;
 
 use crate::{
@@ -31,6 +34,9 @@ pub enum SidecarError {
 }
 
 pub type Result<T> = std::result::Result<T, SidecarError>;
+
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 fn extract_jobs_from_joblist(raw: &Value) -> Vec<(String, Value)> {
   let list = raw
@@ -106,6 +112,9 @@ impl SidecarManager {
     let mut cmd = crate::worker::build_worker_command(&self.app_handle).map_err(SidecarError::Message)?;
 
     settings::apply_worker_env(&mut cmd, &self.app_data_dir);
+
+    #[cfg(target_os = "windows")]
+    cmd.creation_flags(CREATE_NO_WINDOW);
 
     let mut child = cmd
       .stdin(Stdio::piped())

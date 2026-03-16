@@ -197,6 +197,209 @@
   .ui-log-message {
     @apply min-w-0 whitespace-pre-wrap break-words text-[12px] leading-5 text-slate-200;
   }
+
+  .resume-review-header {
+    @apply flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between;
+  }
+
+  .resume-review-kicker {
+    @apply text-[11px] font-semibold uppercase tracking-[0.32em] text-cyan-300/80;
+  }
+
+  .resume-review-title {
+    @apply text-[2rem] font-semibold tracking-[-0.03em] text-content-primary;
+  }
+
+  .resume-review-subtitle {
+    @apply mt-2 max-w-2xl text-sm leading-7 text-content-secondary;
+  }
+
+  .resume-review-meta {
+    @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-4;
+  }
+
+  .resume-review-stat {
+    @apply rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-3 backdrop-blur-xl;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .resume-review-stat-label {
+    @apply text-[10px] font-semibold uppercase tracking-[0.26em] text-content-muted;
+  }
+
+  .resume-review-stat-value {
+    @apply mt-2 text-lg font-semibold tracking-[-0.02em] text-content-primary;
+  }
+
+  .resume-review-shell {
+    @apply grid gap-5 xl:grid-cols-[214px_minmax(0,1fr)];
+  }
+
+  .resume-review-shell--with-aside {
+    @apply xl:grid-cols-[214px_minmax(0,1fr)_368px];
+  }
+
+  .resume-paper-stage {
+    @apply min-w-0 rounded-[32px] border px-4 py-4 lg:px-6 lg:py-6;
+    background: linear-gradient(180deg, rgb(var(--color-surface-elevated) / 0.54) 0%, rgb(var(--color-surface-alt) / 0.52) 100%);
+    border-color: rgb(var(--color-border) / 0.14);
+    box-shadow: 0 24px 56px -44px rgba(15, 23, 42, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .resume-paper-panel {
+    @apply rounded-[26px] border px-5 py-5;
+    background: rgb(var(--color-card-alt) / 0.66);
+    border-color: rgb(var(--color-border) / 0.12);
+    box-shadow: 0 18px 32px -30px rgba(2, 6, 23, 0.46);
+  }
+
+  .resume-paper-panel-soft {
+    @apply rounded-[24px] border px-5 py-5;
+    background: rgb(var(--color-card) / 0.62);
+    border-color: rgb(var(--color-border) / 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .resume-paper-aside {
+    @apply rounded-[28px] border p-4 lg:p-5;
+    background: linear-gradient(180deg, rgb(var(--color-card-hover) / 0.72) 0%, rgb(var(--color-card-alt) / 0.74) 100%);
+    border-color: rgb(var(--color-border) / 0.14);
+    box-shadow: 0 22px 46px -36px rgba(2, 6, 23, 0.54);
+  }
+
+  .resume-paper-title {
+    @apply text-[11px] font-semibold uppercase tracking-[0.28em] text-content-muted;
+  }
+
+  .resume-paper-heading {
+    @apply mt-2 text-[1.6rem] font-semibold tracking-[-0.03em] text-content-primary;
+  }
+
+  .resume-paper-copy {
+    @apply text-sm leading-7 text-content-secondary;
+  }
+
+  .resume-paper-label {
+    @apply text-[11px] font-semibold uppercase tracking-[0.24em] text-content-muted;
+  }
+
+  .resume-paper-input {
+    @apply w-full rounded-2xl border px-4 py-3 text-sm text-content-primary shadow-sm transition-colors duration-150 placeholder:text-content-muted focus:outline-none focus:ring-4 focus:ring-border-glow/10;
+    background: rgb(var(--color-input) / 0.88);
+    border-color: rgb(var(--color-border) / 0.14);
+  }
+
+  .resume-paper-textarea {
+    @apply w-full rounded-[24px] border px-4 py-4 text-sm leading-7 text-content-primary shadow-sm transition-colors duration-150 placeholder:text-content-muted focus:outline-none focus:ring-4 focus:ring-border-glow/10;
+    background: rgb(var(--color-input) / 0.9);
+    border-color: rgb(var(--color-border) / 0.14);
+  }
+
+  .resume-paper-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60;
+    background: linear-gradient(135deg, #0f3a66 0%, #0f5e94 100%);
+    border-color: rgba(12, 74, 110, 0.24);
+    box-shadow: 0 18px 34px -24px rgba(3, 105, 161, 0.56);
+  }
+
+  .resume-paper-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 20px 36px -24px rgba(3, 105, 161, 0.62);
+  }
+
+  .resume-paper-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-medium text-content-secondary transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60;
+    background: rgb(var(--color-card-hover) / 0.62);
+    border-color: rgb(var(--color-border) / 0.16);
+  }
+
+  .resume-paper-btn-secondary:hover {
+    background: rgb(var(--color-card-hover) / 0.8);
+    border-color: rgb(var(--color-border) / 0.24);
+    transform: translateY(-1px);
+  }
+
+  .resume-paper-chip {
+    @apply inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-content-secondary;
+    background: rgb(var(--color-card-hover) / 0.52);
+    border-color: rgb(var(--color-border) / 0.14);
+  }
+
+  .resume-paper-segmented {
+    @apply inline-flex rounded-2xl border p-1;
+    background: rgb(var(--color-base) / 0.34);
+    border-color: rgb(var(--color-border) / 0.12);
+  }
+
+  .resume-paper-segment {
+    @apply rounded-2xl px-4 py-2 text-sm font-medium text-content-muted transition-all duration-150;
+  }
+
+  .resume-paper-segment--active {
+    @apply text-content-primary;
+    background: rgb(var(--color-card-hover) / 0.9);
+    box-shadow: 0 8px 24px -18px rgba(15, 23, 42, 0.38);
+  }
+
+  .resume-paper-file-card {
+    @apply rounded-[22px] border px-4 py-4;
+    background: rgb(var(--color-card-hover) / 0.5);
+    border-color: rgb(var(--color-border) / 0.14);
+  }
+
+  .resume-paper-document {
+    @apply whitespace-pre-wrap rounded-[24px] border px-5 py-5 text-[15px] leading-8 text-content-primary;
+    background: rgb(var(--color-surface-elevated) / 0.54);
+    border-color: rgb(var(--color-border) / 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .resume-paper-annotation {
+    @apply rounded-[20px] border px-4 py-4;
+    background: rgb(var(--color-card-hover) / 0.46);
+    border-color: rgb(var(--color-border) / 0.14);
+  }
+
+  .resume-paper-alert {
+    @apply rounded-[20px] border px-4 py-3 text-sm leading-6;
+  }
+
+  .resume-paper-alert--warning {
+    @apply text-amber-900;
+    background: rgba(255, 247, 224, 0.92);
+    border-color: rgba(245, 158, 11, 0.22);
+  }
+
+  .resume-paper-alert--success {
+    @apply text-emerald-900;
+    background: rgba(236, 253, 245, 0.92);
+    border-color: rgba(52, 211, 153, 0.24);
+  }
+
+  .resume-paper-alert--danger {
+    @apply text-rose-900;
+    background: rgba(255, 241, 242, 0.94);
+    border-color: rgba(244, 63, 94, 0.22);
+  }
+
+  .resume-workflow-rail {
+    @apply rounded-[28px] border p-4 backdrop-blur-xl;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(17, 24, 39, 0.88) 100%);
+    border-color: rgba(148, 163, 184, 0.14);
+    box-shadow: 0 24px 52px -42px rgba(2, 6, 23, 0.96);
+  }
+
+  .resume-workflow-item {
+    @apply relative flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-all duration-150;
+  }
+
+  .resume-workflow-index {
+    @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border text-[11px] font-semibold tracking-[0.16em];
+  }
+
+  .resume-workflow-tag {
+    @apply inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em];
+  }
 }
 
 /* Dark scrollbar */

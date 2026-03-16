@@ -7,6 +7,15 @@ import { focusWithoutScroll, measureMenuLayout, type MenuStyle } from "./uiSelec
 
 defineOptions({ inheritAttrs: false });
 
+const props = withDefaults(
+  defineProps<{
+    variant?: "default" | "workspace";
+  }>(),
+  {
+    variant: "default",
+  },
+);
+
 const model = defineModel<string>({ default: "" });
 
 const attrs = useAttrs();
@@ -28,6 +37,39 @@ const buttonAttrs = computed(() => {
   const { class: _class, ...rest } = attrs;
   return rest;
 });
+const isWorkspace = computed(() => props.variant === "workspace");
+const triggerClass = computed(() =>
+  isWorkspace.value
+    ? "group relative flex w-full items-center justify-between gap-3 rounded-2xl bg-card-hover/70 px-4 py-3 text-sm text-content-primary shadow-[0_18px_36px_-28px_rgba(2,6,23,0.52)] transition-colors duration-200 hover:bg-card-hover/90 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+    : "group relative flex w-full items-center justify-between gap-2 rounded-xl border border-border/10 bg-input/90 px-3.5 py-2.5 text-sm text-content-primary shadow-inner transition-colors duration-200 hover:border-border/20 hover:bg-card-hover/75 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60",
+);
+const triggerOpenClass = computed(() => (isWorkspace.value ? "border-border-glow/25 bg-card-hover/95 ring-1 ring-inset ring-border-glow/20" : "border-border-glow/35 bg-card-hover/80"));
+const triggerOverlayClass = computed(() =>
+  isWorkspace.value
+    ? "pointer-events-none absolute inset-0 rounded-2xl border border-transparent"
+    : "pointer-events-none absolute inset-0 rounded-xl border border-transparent transition-colors group-hover:border-border/10",
+);
+const triggerFocusRingClass = computed(() =>
+  isWorkspace.value
+    ? "pointer-events-none absolute -inset-0.5 hidden rounded-[1.1rem] border border-border-glow/18 opacity-0 transition-opacity group-focus-visible:block group-focus-visible:opacity-100"
+    : "pointer-events-none absolute -inset-0.5 hidden rounded-[1rem] border-2 border-border-glow/30 opacity-0 transition-opacity group-focus-visible:block group-focus-visible:opacity-100",
+);
+const menuClass = computed(() =>
+  isWorkspace.value
+    ? "fixed z-[120] overflow-hidden rounded-[22px] bg-surface-elevated/97 shadow-2xl shadow-black/50 backdrop-blur-xl"
+    : "fixed z-[120] overflow-hidden rounded-2xl border border-border/10 bg-surface-elevated/95 shadow-2xl shadow-black/40 backdrop-blur-xl",
+);
+const optionClass = computed(() =>
+  isWorkspace.value
+    ? "flex w-full items-center gap-3 rounded-2xl px-3.5 py-3 text-left text-sm transition-colors duration-150"
+    : "flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition-colors duration-150",
+);
+const optionStateClass = computed(() => ({
+  disabled: isWorkspace.value ? "cursor-not-allowed opacity-40" : "cursor-not-allowed opacity-50",
+  hover: isWorkspace.value ? "hover:bg-card-hover/90" : "hover:bg-card-hover/75",
+  selected: isWorkspace.value ? "bg-border-glow/8 text-content-primary ring-1 ring-inset ring-border-glow/18" : "bg-border-glow/10 text-content-primary ring-1 ring-inset ring-border-glow/20",
+  active: isWorkspace.value ? "bg-card-hover/95 text-content-primary" : "bg-card-hover/90 text-content-primary",
+}));
 
 function refreshItems(): void {
   items.value = parseSelectItems(slots.default?.() ?? []);
@@ -219,8 +261,7 @@ onUnmounted(() => {
       ref="buttonEl"
       v-bind="buttonAttrs"
       type="button"
-      class="group relative flex w-full items-center justify-between gap-2 rounded-xl border border-border/10 bg-input/90 px-3.5 py-2.5 text-sm text-content-primary shadow-inner transition-colors duration-200 hover:border-border/20 hover:bg-card-hover/75 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-      :class="open ? 'border-border-glow/35 bg-card-hover/80' : ''"
+      :class="[triggerClass, open ? triggerOpenClass : '']"
       :disabled="isDisabled"
       :aria-expanded="open"
       :aria-controls="listboxId"
@@ -235,11 +276,11 @@ onUnmounted(() => {
         aria-hidden="true"
       />
       <span
-        class="pointer-events-none absolute inset-0 rounded-xl border border-transparent transition-colors group-hover:border-border/10"
+        :class="triggerOverlayClass"
         aria-hidden="true"
       />
       <span
-        class="pointer-events-none absolute -inset-0.5 hidden rounded-[1rem] border-2 border-border-glow/30 opacity-0 transition-opacity group-focus-visible:block group-focus-visible:opacity-100"
+        :class="triggerFocusRingClass"
         aria-hidden="true"
       />
     </button>
@@ -249,7 +290,7 @@ onUnmounted(() => {
         v-if="open"
         ref="listboxEl"
         :id="listboxId"
-        class="fixed z-[120] overflow-hidden rounded-2xl border border-border/10 bg-surface-elevated/95 shadow-2xl shadow-black/40 backdrop-blur-xl"
+        :class="menuClass"
         :style="menuStyle"
         role="listbox"
         tabindex="-1"
@@ -269,11 +310,11 @@ onUnmounted(() => {
               :ref="(el) => setOptionEl(it.optionIndex, el)"
               :id="optionDomId(it.optionIndex)"
               type="button"
-              class="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition-colors duration-150"
               :class="[
-                it.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-card-hover/75',
-                it.value === model ? 'bg-border-glow/10 text-content-primary ring-1 ring-inset ring-border-glow/20' : 'text-content-secondary',
-                it.optionIndex === activeIndex ? 'bg-card-hover/90 text-content-primary' : '',
+                optionClass,
+                it.disabled ? optionStateClass.disabled : optionStateClass.hover,
+                it.value === model ? optionStateClass.selected : 'text-content-secondary',
+                it.optionIndex === activeIndex ? optionStateClass.active : '',
               ]"
               :disabled="it.disabled"
               :aria-selected="it.value === model"
